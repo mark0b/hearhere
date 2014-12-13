@@ -9,7 +9,7 @@ def page_count():
 	tree = par.parse(init_res)
 	root = tree.getroot()
 	pages = root.find_class('pagenum')
-	last = pages[len(pages)-1]
+	last = pages[-1]
 	count_string = last.get('href')
 	garbage, number = count_string.split('=')
 	pagecount = int(number)
@@ -20,18 +20,20 @@ def page_scrape(pagina):
 	response = urllib2.urlopen(base_url+str(pagina))
 	tree = par.parse(response)
 	root = tree.getroot()
-	elements = root.find_class('bandName')
+	result = root.get_element_by_id('bandlist')
+	names = result.find_class('bandName')
 	bands = {}
-	for i in range(0,len(elements)-1):
-		print elements[i].keys()
-		print elements[i].items()
-		print elements[i].get('class')
-		bands[elements[i].get('bandName')] = elements[i].get('href')
+	band_elements = result.getiterator('a')
+	for b in band_elements:
+		bands[b.get('href')] = b.find_class('bandName')[0].text
 	return bands
 
 
 if __name__ == '__main__':
-	bands = page_scrape(0)
-	print bands
+	masterdict = {}
+	pagecount = page_count()
+	for i in range(1,pagecount):
+		masterdict.update(page_scrape(0))
+	print masterdict
 	
 
