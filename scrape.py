@@ -1,6 +1,9 @@
 import requ.py
 
-count = page_count()
-	responses = []
-	for i in range(0,count):
-		responses.append(page_scrape(i))
+masterdict = {}
+	pagecount = page_count()
+	for i in range(1,pagecount):
+		masterdict.update(index_scrape(i))
+
+come_on = artist_scrape('http://nikitaxpvshkin.bandcamp.com')
+print come_on
