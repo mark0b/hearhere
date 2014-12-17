@@ -8,10 +8,17 @@ handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
-
+- url: /assets
+  static_dir: assets
+- url: /
+  static_files: assets/index.html
+  upload: assets/index\.html
 - url: .*
   script: main.app
 
 libraries:
+- name: lxml
+  version: "2.3.5"
 - name: webapp2
   version: "2.5.2"
+

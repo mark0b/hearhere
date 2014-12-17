@@ -1,0 +1,37 @@
+html, body {
+  background: #333;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: sans-serif;
+}
+
+h1 {
+  margin: 0;
+}
+
+body>div { height: 100%; }
+
+#left-col, #maps-container {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  float: left;
+}
+
+  #left-col {
+    background: orange;
+    width: 300px;
+  }
+
+    #left-col>div {
+      padding: 1em;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+  #maps-container {
+    background: lime;
+    width: calc(100% - 300px);
+  }
+
+    #map-canvas { height: 100% }
