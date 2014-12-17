@@ -23,3 +23,13 @@ class MainHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
 ], debug=True)
+
+
+# TODO add scraping daemon
+# https://cloud.google.com/appengine/docs/python/modules/background_thread
+
+# TODO store cached JSON of scrape on disk and in memcache
+# https://cloud.google.com/appengine/docs/python/memcache/usingmemcache#Pattern
+
+# TODO write results to datastore
+
