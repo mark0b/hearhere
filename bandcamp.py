@@ -24,6 +24,8 @@ def scrapeindexes():
         bandlist = parse(html).getroot().get_element_by_id('bandlist')
         bands |= {a.get('href') for a in bandlist.getiterator('a')}
 
+    return bands
+
 
 
 def scrapeband(url):
