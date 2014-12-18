@@ -10,7 +10,6 @@ from time import sleep
 
 
 
-
 def urlopen(url, attempts=3):
     """returns the html from a url or None if all attempts fail"""
 
@@ -19,7 +18,7 @@ def urlopen(url, attempts=3):
         return None
     try:
         return urllib2.urlopen(url)
-    except urllib2.HTTPError:
+    except urllib2.URLError:
         sleep(10) # secs
         return urlopen(url, attempts - 1)
 
@@ -38,7 +37,7 @@ def scrapeindexes():
     reurl = re.compile(r'http://([^\.]+)\.bandcamp\.com')
 
     # scrape each index page for band urls
-    for i in range(1, 2 or numpages + 1):
+    for i in range(1, numpages + 1):
         html = urlopen('https://bandcamp.com/artist_index?page=%d' % i)
         bandlist = parse(html).getroot().get_element_by_id('bandlist')
         for a in bandlist.getiterator('a'):
@@ -60,6 +59,7 @@ def scrapeband(url):
 
     return {
         # TODO add back fields
+        # TODO possible problem with unicode values
         'location': e.find_class('location secondaryText')[0].text,
         'name': e.find_class('title')[0].text,
         'tags': [a.text_content() for a in root.find_class('tag')]
@@ -67,10 +67,14 @@ def scrapeband(url):
 
 
 
+
 def scrape():
+    # TODO only scrape newest artists who haven't be scraped before
     reid = re.compile(r'http://([^\.]+)\.bandcamp\.com')
     data = {reid.match(url).group(1): scrapeband(url) for url in scrapeindexes()}
     return {id0: data[id0] for id0 in data if data[id0]}
+
+
 
 
 if __name__ == '__main__':
