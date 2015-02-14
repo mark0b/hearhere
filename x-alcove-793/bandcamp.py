@@ -2,11 +2,18 @@
 
 import urllib2
 import re
+import logging
 from lxml.html import parse
 from json import dumps as tojson
 from time import sleep
 
 
+
+def getlatlng(place):
+    """gets the lat lng from the google maps places api"""
+
+    # TODO implement this
+    return place
 
 
 
@@ -14,6 +21,7 @@ def urlopen(url, attempts=3):
     """returns the html from a url or None if all attempts fail"""
 
     if attempts == 0:
+        logging.warning("could not access %s" % url)
         # TODO add app engine logging
         return None
     try:
@@ -44,6 +52,7 @@ def scrapeindexes():
             url = a.get('href')
             if reurl.match(url):
                 yield url
+                sleep(1)
 
 
 
