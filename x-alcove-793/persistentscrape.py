@@ -1,5 +1,8 @@
-
-import fs # find actual one
+from urllib2 import urlopen
+from os.path import isfile
+from json import dumps as tojson
+from time import sleep
+import re
 
 
 def loadurlfile(fname):
@@ -17,19 +20,17 @@ def freshfname(fname):
     parts = fname.split('.')
     (ext, fname) = (parts.pop(), '.'.join(parts))
     i = 0
-    while fs.exists('%s%d.%s' % (fname, i, ext)): # find actual fn
+    while isfile('%s%d.%s' % (fname, i, ext)): # find actual fn
         i += 1
     return '%s%d.%s' % (fname, i, ext)
 
-
-def lastfname(fname):
-    pass
 
 
 def scrapeband(url):
     """scrapes a bandcamp band page for the band's info"""
 
     html = urlopen(url)
+    sleep(1)
     if html is None: return
     root = parse(html).getroot()
     e = root.get_element_by_id('band-name-location', None)
@@ -43,33 +44,67 @@ def scrapeband(url):
         'tags': [a.text_content() for a in root.find_class('tag')]
     }
 
-BANDS = 'bandurls.txt'
-VISITED = 'visited.txt'
-FAILED = 'failed.txt'
-DATA = 'data.json'
+reurl = re.compile(r'http://([^\.]+)\.bandcamp\.com')
+
+def htmlread(url):
+    match = reurl.match(url)
+    if not match:
+        return
+    id0 = match.group(1)
+    if isfile(id0 + '.html'):
+        return
+    html = urlopen(url)
+    sleep(1)
+    if not html:
+        raise Exception()
+    with open('html/%s.html' % (id0,) ,'w') as f:
+        f.write(html.read())
+    
+
+if __name__ == '__main__':
+    with open('bandurls.txt', 'r') as urls:
+        with open('log.txt', 'w') as log:
+            for url in urls:
+                try:
+                    htmlread(url)
+                except Exception():
+                    log.write(url + '\n')
 
 
-bands = loadurlfile(BANDS)
-visited = loadurlfile(VISITED)
-failed = set()
-queue = bands - visited
-reid = re.compile(r'http://([^\.]+)\.bandcamp\.com')
+def bands():    
+    BANDS = 'bandurls.txt'
+    VISITED = 'visited.txt'
+    FAILED = 'failed.txt'
+    DATA = 'data.json'
 
-# scrape urls
-data = {}
-while queue:
-    url = queue.pop()
-    try:
-        id0 = reid.match(url).group(1)
-        data[id0] = scrapeband(url)
-        visited.add(url)
-    except Exception():
-        failed.add(url)
 
-# write results of scrape
-for (fname, text) in ((BANDS, bands), (VISITED, visited), (FAILED, failed), (DATA, data)):
-    with open(freshfname(fname), 'w') as f:
-        f.write(text)
+    bands = loadurlfile(BANDS)
+    visited = loadurlfile(VISITED)
+    failed = set()
+    queue = bands - visited
+    
+
+    # scrape urls
+    data = {}
+    while queue:
+        url = queue.pop()
+        try:
+            id0 = reurl.match(url).group(1)
+
+            #data[id0] = scrapeband(url)
+            visited.add(url)
+        except Exception():
+            failed.add(url)
+
+    # write results of scrape
+    # for (fname, urls) in ( (VISITED, visited), (FAILED, failed)):
+    #     saveurlfile(fname,urls)
+
+    # with open(freshfname('data.json'), 'w') as f:
+    #     f.write(tojson(data))
+
+
+
 
 
 
