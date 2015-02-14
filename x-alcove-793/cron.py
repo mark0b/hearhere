@@ -17,31 +17,22 @@
 
 import webapp2
 import bandcamp
-import logging
 from google.appengine.api import background_thread
 
 
 
 
 
-
-class MainHandler(webapp2.RequestHandler):
+class InitDatastore(webapp2.RequestHandler):
     def get(self):
-        self.response.write('Hello world!')
+        pass
 
 
 
 
-
-app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+cron = webapp2.WSGIApplication([
+    ('/cron/', MainHandler)
 ], debug=True)
-
-
-
-logging.info("starting scrape")
-logging.info(bandcamp.scrape())
-
 
 
 
